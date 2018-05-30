@@ -4,7 +4,7 @@
 
 ```shell
 # Install packages
-pip install Flask line-bot-sdk gunicorn tinytag
+pip install Flask line-bot-sdk gunicorn tinytag zhconv
 
 # Or
 virtualenv venv
@@ -35,3 +35,4 @@ heroku open
 - https://developers.line.me/
 - https://developers.line.me/en/docs/messaging-api/reference/
 - https://github.com/line/line-bot-sdk-python
+- https://tech.yandex.com/translate/

@@ -2,5 +2,6 @@ export PORT=5000
 export FLASK_DEBUG=1
 export LINE_CHANNEL_SECRET=
 export LINE_CHANNEL_ACCESS_TOKEN=
+export YANDEX_API_KEY=
 
 python main.py

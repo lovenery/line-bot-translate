@@ -2,6 +2,7 @@ from flask import Flask, request, abort
 from os import environ, path
 import requests
 from tinytag import TinyTag
+from zhconv import convert
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -65,11 +66,21 @@ def handle_message(event):
         duration= tiny_tag.duration * 1000, #milliseconds
     )
 
+    params = {
+        'key': environ['YANDEX_API_KEY'],
+        'text': msg,
+        'lang': 'zh',
+    }
+    res = requests.get('https://translate.yandex.net/api/v1.5/tr.json/translate', params=params)
+    yandex = res.json()
+    yandex_text = convert(yandex['text'][0], 'zh-tw')
+
     try:
         line_bot_api.reply_message(event.reply_token, [
             audio_message,
             TextSendMessage(text='你說：「'+event.message.text+'」。'),
             TextSendMessage(text='點這裡聽聽看：{}'.format(url_path)),
+            TextSendMessage(text='意思是：{}'.format(yandex_text)),
         ])
     except LineBotApiError as e:
         print(e.status_code)
