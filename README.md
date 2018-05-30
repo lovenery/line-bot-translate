@@ -26,6 +26,7 @@ git remote add heroku https://git.heroku.com/[NAME].git # or heroku git:remote -
 heroku config
 heroku config:set LINE_CHANNEL_SECRET=
 heroku config:set LINE_CHANNEL_ACCESS_TOKEN=
+heroku config:set YANDEX_API_KEY=
 git push heroku master
 heroku open
 ```
