@@ -4,7 +4,7 @@
 
 ```shell
 # Install packages
-pip install Flask line-bot-sdk gunicorn
+pip install Flask line-bot-sdk gunicorn tinytag
 
 # Or
 virtualenv venv

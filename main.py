@@ -1,6 +1,7 @@
 from flask import Flask, request, abort
 from os import environ, path
 import requests
+from tinytag import TinyTag
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -12,6 +13,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
     AudioSendMessage
 )
+from linebot.exceptions import LineBotApiError
 
 app = Flask(__name__)
 
@@ -39,35 +41,40 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    msg = str(event.message.text)
-
     base_dir = path.abspath(path.dirname(__file__))
-    relative_path = 'static/uploads/'
+    relative_dir = 'static/uploads/'
     file_name = event.message.id
     file_extension = '.mp3'
-    file_path = relative_path + file_name + file_extension
 
+    file_rel_path = path.join(relative_dir, file_name + file_extension)
+    file_abs_path = path.join(base_dir, file_rel_path)
+    url_path = path.join('https://' + request.host, file_rel_path)
+
+    msg = str(event.message.text)
     url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q={}'.format(msg)
     res = requests.get(url)
-    with open(path.join(base_dir, file_path), 'wb') as fd:
+    with open(file_abs_path, 'wb') as fd:
         for chunk in res.iter_content():
             fd.write(chunk)
 
-    url_path = path.join('https://' + request.host, file_path)
+    tiny_tag = TinyTag.get(file_abs_path)
+    # print('It is %f milliseconds long.' % (tiny_tag.duration * 1000))
+
     audio_message = AudioSendMessage(
         original_content_url=url_path,
-        duration=240000,
+        duration= tiny_tag.duration * 1000, #milliseconds
     )
 
     try:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='你說：「'+event.message.text+'」。'),
+        line_bot_api.reply_message(event.reply_token, [
             audio_message,
-        )
-    except Exception as e:
-        print('Error:')
-        print(e)
+            TextSendMessage(text='你說：「'+event.message.text+'」。'),
+            TextSendMessage(text='點這裡聽聽看：{}'.format(url_path)),
+        ])
+    except LineBotApiError as e:
+        print(e.status_code)
+        print(e.error.message)
+        print(e.error.details)
 
 if __name__ == '__main__':
     app.run(port = int(environ['PORT']))
