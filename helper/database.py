@@ -7,6 +7,7 @@ import gspread
 """
 gspread:
 https://youtu.be/vISRn5qFrkM
+https://github.com/burnash/gspread
 https://developers.google.com/sheets/api/reference/rest/v4/ValueInputOption
 
 oauth issues:
