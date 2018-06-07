@@ -3,5 +3,7 @@ export FLASK_DEBUG=1
 export LINE_CHANNEL_SECRET=
 export LINE_CHANNEL_ACCESS_TOKEN=
 export YANDEX_API_KEY=
+export GOOGLE_CLIENT_SECRET="$(< client_secret.json)"
+export GOOGLE_SHEET_NAME=""
 
 python main.py

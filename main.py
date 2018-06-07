@@ -3,6 +3,8 @@ from os import environ, path
 import requests
 from tinytag import TinyTag
 from zhconv import convert
+from helper import database
+import threading
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -61,11 +63,6 @@ def handle_message(event):
     tiny_tag = TinyTag.get(file_abs_path)
     # print('It is %f milliseconds long.' % (tiny_tag.duration * 1000))
 
-    audio_message = AudioSendMessage(
-        original_content_url=url_path,
-        duration= tiny_tag.duration * 1000, #milliseconds
-    )
-
     params = {
         'key': environ['YANDEX_API_KEY'],
         'text': msg,
@@ -77,7 +74,10 @@ def handle_message(event):
 
     try:
         line_bot_api.reply_message(event.reply_token, [
-            audio_message,
+            AudioSendMessage(
+                original_content_url=url_path,
+                duration= tiny_tag.duration * 1000, #milliseconds
+            ),
             TextSendMessage(text='你說：「'+event.message.text+'」。'),
             TextSendMessage(text='點這裡聽聽看：{}'.format(url_path)),
             TextSendMessage(text='意思是：{}'.format(yandex_text)),
@@ -86,6 +86,22 @@ def handle_message(event):
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
+
+    if not environ.get('GOOGLE_CLIENT_SECRET') or not environ.get('GOOGLE_SHEET_NAME'):
+        app.logger.info("GOOGLE_CLIENT_SECRET or GOOGLE_SHEET_NAME was not found or empty.")
+    else:
+        profile = line_bot_api.get_profile(event.source.user_id)
+        kwargs_dict = {
+            'profile_dict': {
+                'display_name': profile.display_name,
+                'picture_url': profile.picture_url,
+                'status_message': profile.status_message,
+                'user_id': profile.user_id
+            },
+            'msg': msg
+        }
+        db_thread = threading.Thread(target=database.append_google_sheet, kwargs=kwargs_dict)
+        db_thread.start()
 
 if __name__ == '__main__':
     app.run(port = int(environ['PORT']))

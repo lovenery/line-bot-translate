@@ -4,7 +4,7 @@
 
 ```shell
 # Install packages
-pip install Flask line-bot-sdk gunicorn tinytag zhconv
+pip install Flask line-bot-sdk gunicorn tinytag zhconv gspread authlib
 
 # Or
 virtualenv venv
@@ -27,6 +27,8 @@ heroku config
 heroku config:set LINE_CHANNEL_SECRET=
 heroku config:set LINE_CHANNEL_ACCESS_TOKEN=
 heroku config:set YANDEX_API_KEY=
+heroku config:set GOOGLE_CLIENT_SECRET="$(< client_secret.json)"
+heroku config:set GOOGLE_SHEET_NAME=""
 git push heroku master
 heroku open
 ```
@@ -37,3 +39,5 @@ heroku open
 - https://developers.line.me/en/docs/messaging-api/reference/
 - https://github.com/line/line-bot-sdk-python
 - https://tech.yandex.com/translate/
+- https://coreyward.svbtle.com/how-to-send-a-multiline-file-to-heroku-config
+- https://github.com/burnash/gspread
