@@ -6,7 +6,7 @@
 # Install packages
 pip install Flask line-bot-sdk gunicorn tinytag zhconv gspread authlib
 
-# Or
+# OR
 virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
